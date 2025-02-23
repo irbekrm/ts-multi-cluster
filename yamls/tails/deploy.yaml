@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tails
+spec:
+  selector:
+    matchLabels:
+      app: tails 
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tails
+    spec:
+      containers:
+      - image: europe-west2-docker.pkg.dev/tailscale-sandbox/irbe-images/apps:v0.0.6
+        imagePullPolicy: Always
+        name: tails 
+        ports:
+        - containerPort: 8080
+        env:
+        - name: APP
+          value: tails
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tails 
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP
+  selector:
+    app: tails 

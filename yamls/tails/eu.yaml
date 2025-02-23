@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eu-tails 
+  annotations:
+    tailscale.com/proxy-group: ingress-proxies
+    tailscale.com/http-endpoint: "enabled"
+    tailscale.com/tags: "tag:eu"
+spec:
+  tls:
+  - hosts:
+    - eu-tails
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: tails
+            port:
+              number: 80
+        pathType: Prefix 
+        path: /
+  ingressClassName: tailscale

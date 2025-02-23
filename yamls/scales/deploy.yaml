@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scales
+spec:
+  selector:
+    matchLabels:
+      app: scales 
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: scales
+    spec:
+      containers:
+      - image: europe-west2-docker.pkg.dev/tailscale-sandbox/irbe-images/apps:v0.0.6
+        imagePullPolicy: Always
+        name: scales 
+        ports:
+        - containerPort: 8080
+        env:
+        - name: APP
+          value: scales
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scales 
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP
+  selector:
+    app: scales 
