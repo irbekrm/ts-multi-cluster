@@ -41,16 +41,19 @@ For each app:
 
 ### In the US cluster
 
+1. Create OAuth client creds for the operator with VIPServices scope in addition to the currently required
+`Devices Core` and `Auth Keys` write scopes.
+https://tailscale.com/kb/1236/kubernetes-operator#setting-up-the-kubernetes-operator
+
 1. Install the operator
 
 ```
 $ helm upgrade --install operator tailscale-dev/tailscale-operator \
 -n tailscale --create-namespace  --set oauth.clientId=<id> \
---set oauth.clientSecret=<key> \
---set operatorConfig.image.repo=europe-west2-docker.pkg.dev/tailscale-sandbox/irbe-images/operator \
---set operatorConfig.image.tag=v0.0.5multicluster
+--set oauth.clientSecret=<key>
 ```
-1. Create 'us' ProxyGroup
+
+1. Create 'us' ProxyGroup, configure it to use LetsEncrypt staging endpoint (for testing)
 
 ```
 $ kubectl apply -f yamls/pg-us.yaml
@@ -71,6 +74,12 @@ $ kubectl apply -f yamls/tails/us.yaml
 $ kubectl apply -f yamls/scales/us.yaml
 ```
 
+1. Wait for the Ingress resources to be ready
+
+```
+$ kubectl wait ingress us-scales --for=jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+```
+
 ### In the EU cluster
 
 1. Install the operator
@@ -78,11 +87,10 @@ $ kubectl apply -f yamls/scales/us.yaml
 ```
 $ helm upgrade --install operator tailscale-dev/tailscale-operator \
 -n tailscale --create-namespace  --set oauth.clientId=<id> \
---set oauth.clientSecret=<key> \
---set operatorConfig.image.repo=europe-west2-docker.pkg.dev/tailscale-sandbox/irbe-images/operator \
---set operatorConfig.image.tag=v0.0.5multicluster
+--set oauth.clientSecret=<key>
 ```
-1. Create 'eu' ProxyGroup
+
+1. Create 'eu' ProxyGroup, configure it to use LE staging endpoint
 
 ```
 $ kubectl apply -f yamls/pg-eu.yaml
@@ -101,6 +109,13 @@ $ kubectl apply -f yamls/scales/global.yaml
 ```
 $ kubectl apply -f yamls/tails/eu.yaml
 $ kubectl apply -f yamls/scales/eu.yaml
+```
+```
+
+1. Wait for Ingresses to be ready
+
+```
+$ kubectl wait ingress eu-scales --for=jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 ```
 
 ## Test

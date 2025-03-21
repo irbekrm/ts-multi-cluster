@@ -9,7 +9,9 @@ import (
 	"strings"
 )
 
-var app string
+var (
+	app string
+)
 
 func init() {
 	app = os.Getenv("APP")
@@ -56,7 +58,8 @@ func regionHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Error getting region: %v", err), http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintf(w, "Hello from app %s in %s\n", app, region)
+	ipp := strings.Split(r.RemoteAddr, ":")
+	fmt.Fprintf(w, "Hello from app %s in %s. Received request from proxy with IP %s\n", app, region, ipp[0])
 }
 
 func main() {

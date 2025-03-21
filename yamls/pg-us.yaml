@@ -6,3 +6,11 @@ spec:
   type: ingress
   replicas: 2
   tags: ["tag:usingress"]
+  proxyClass: le-staging
+---
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyClass
+metadata:
+  name: le-staging
+spec:
+ useLetsEncryptStagingEnvironment: true
